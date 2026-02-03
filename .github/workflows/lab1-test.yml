@@ -1,0 +1,42 @@
+name: Lab1 test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install g++ and make
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+
+      - name: Clean previous build
+        run: make clean || true
+
+      - name: Build with makefile (Test 4)
+        run: make
+
+      - name: Verify executable exists (Test 4)
+        run: test -x averager
+
+      - name: Test 1 - Check myfunctions.h
+        run: |
+          grep -q "#include <iostream>" myfunctions.h && \
+          grep -q "using namespace std;" myfunctions.h && \
+          grep -q "calculateAverage(int nums[])" myfunctions.h && \
+          grep -q "getUserInput()" myfunctions.h && \
+          grep -q "promptUser()" myfunctions.h
+
+      - name: Test 2 - Check myfunctions.cpp
+        run: |
+          grep -q "#include \"myfunctions.h\"" myfunctions.cpp && \
+          grep -q "cin >>" myfunctions.cpp && \
+          grep -q "cout <<" myfunctions.cpp
+
+      - name: Test 3 - Exactly two cout << in main.cpp
+        run: grep -c "cout <<" main.cpp | grep -q "^2$"
