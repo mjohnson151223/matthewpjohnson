@@ -1,6 +1,6 @@
 name: Lab1 test
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   test:
@@ -10,33 +10,33 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install g++ and make
+      - name: Install g++ and make (required before any build)
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential
 
-      - name: Clean previous build
-        run: make clean || true
-
-      - name: Build with makefile (Test 4)
+      - name: Build with makefile (Test 4 - compilation)
         run: make
 
-      - name: Verify executable exists (Test 4)
-        run: test -x averager
+      - name: Verify executable exists and is runnable (Test 4)
+        run: |
+          ls -l averager
+          test -x averager
 
-      - name: Test 1 - Check myfunctions.h
+      - name: Test 1 - myfunctions.h checks
         run: |
           grep -q "#include <iostream>" myfunctions.h && \
           grep -q "using namespace std;" myfunctions.h && \
           grep -q "calculateAverage(int nums[])" myfunctions.h && \
-          grep -q "getUserInput()" myfunctions.h && \
-          grep -q "promptUser()" myfunctions.h
+          grep -q "promptUser()" myfunctions.h && \
+          grep -q "getUserInput()" myfunctions.h
 
-      - name: Test 2 - Check myfunctions.cpp
+      - name: Test 2 - myfunctions.cpp checks
         run: |
           grep -q "#include \"myfunctions.h\"" myfunctions.cpp && \
           grep -q "cin >>" myfunctions.cpp && \
           grep -q "cout <<" myfunctions.cpp
 
       - name: Test 3 - Exactly two cout << in main.cpp
-        run: grep -c "cout <<" main.cpp | grep -q "^2$"
+        run: |
+          grep -c "cout <<" main.cpp | grep -q "^2$"
